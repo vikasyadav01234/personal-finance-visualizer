@@ -1,40 +1,140 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Personal Finance Tracker
+
+A modern web application for tracking personal finances, built with Next.js, MongoDB, and Tailwind CSS.
+
+![Personal Finance Tracker](https://raw.githubusercontent.com/vikasyadav01234/personal-finance-tracker/main/public/screenshot.png)
+
+## Features
+
+- 💰 Track income and expenses
+- 📊 Visual data representation with charts
+- 📱 Responsive design that works on all devices
+- 🗃️ Category-based transaction organization
+- 📈 Monthly financial overview
+- 🔍 Transaction history with search and filter
+- 💾 Persistent data storage with MongoDB
+
+## Tech Stack
+
+- **Frontend:**
+  - [Next.js](https://nextjs.org/) - React framework for production
+  - [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+  - [Recharts](https://recharts.org/) - Composable charting library
+
+- **Backend:**
+  - [MongoDB](https://www.mongodb.com/) - NoSQL database
+  - [Mongoose](https://mongoosejs.com/) - MongoDB object modeling
+
+- **Deployment:**
+  - [Vercel](https://vercel.com/) - Platform for frontend deployment
+  - [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) - Cloud database service
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 14.0 or later
+- MongoDB Atlas account or local MongoDB installation
+- Git
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/vikasyadav01234/personal-finance-tracker.git
+cd personal-finance-tracker
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+3. Create a `.env.local` file in the root directory:
+```env
+MONGODB_URI=your_mongodb_connection_string
+```
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+4. Run the development server:
+```bash
+npm run dev
+```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Environment Variables
 
-## Learn More
+- `MONGODB_URI`: Your MongoDB connection string
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+```
+personal-finance-tracker/
+├── components/           # React components
+│   ├── Dashboard.js     # Dashboard with charts
+│   ├── TransactionForm.js # Form for adding/editing transactions
+│   └── TransactionList.js # List of transactions
+├── lib/
+│   └── mongodb.js       # MongoDB connection utility
+├── models/
+│   └── Transaction.js   # Mongoose model for transactions
+├── pages/
+│   ├── api/            # API routes
+│   │   └── transactions/
+│   │       ├── index.js
+│   │       └── [id].js
+│   ├── _app.js
+│   └── index.js        # Main page
+├── public/             # Static files
+└── styles/            # Global styles
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## API Routes
 
-## Deploy on Vercel
+### Transactions
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `GET /api/transactions` - Get all transactions
+- `POST /api/transactions` - Create a new transaction
+- `PUT /api/transactions/:id` - Update a transaction
+- `DELETE /api/transactions/:id` - Delete a transaction
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+## Deployment
+
+This project is deployed on Vercel. To deploy your own instance:
+
+1. Push your code to GitHub
+2. Import your repository to Vercel
+3. Add your environment variables
+4. Deploy!
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+
+## Acknowledgments
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [Recharts Documentation](https://recharts.org/en-US/)
+- [MongoDB Documentation](https://docs.mongodb.com/)
+
+## Author
+
+**Vikas Yadav**
+- GitHub: [@vikasyadav01234](https://github.com/vikasyadav01234)
+
+## Support
+
+If you found this project helpful, please give it a ⭐️!
+
+---
+
+Created by [Vikas Yadav](https://github.com/vikasyadav01234) - 2024
