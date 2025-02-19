@@ -50,7 +50,7 @@ cd personal-finance-tracker
 npm install
 ```
 
-3. Create a `.env.local` file in the root directory:
+3. Create a `.env` file in the root directory:
 ```env
 MONGODB_URI=your_mongodb_connection_string
 ```
