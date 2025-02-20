@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import TransactionForm from '../components/TransactionForm';
-import TransactionList from '../components/TransactionList';
-import Dashboard from '../components/Dashboard';
-import BudgetForm from '../components/BudgetForm';
-import BudgetOverview from '../components/BudgetOverview';
+import { useState, useEffect } from "react";
+import TransactionForm from "../components/TransactionForm";
+import TransactionList from "../components/TransactionList";
+import Dashboard from "../components/Dashboard";
+import BudgetForm from "../components/BudgetForm";
+import BudgetOverview from "../components/BudgetOverview";
 
 export default function Home() {
   const [transactions, setTransactions] = useState([]);
@@ -11,20 +11,23 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingTransaction, setEditingTransaction] = useState(null);
-  
+
   // Set these as refs since they won't change during component lifecycle
-  const currentMonth = new Date().toLocaleString('default', { month: 'long' }).toLowerCase();
+  const currentMonth = new Date()
+    .toLocaleString("default", { month: "long" })
+    .toLowerCase();
   const currentYear = new Date().getFullYear();
+  const [editingBudget, setEditingBudget] = useState(null);
 
   // Combine fetch functions
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      
+
       // Fetch transactions
-      const transactionsResponse = await fetch('/api/transactions');
+      const transactionsResponse = await fetch("/api/transactions");
       if (!transactionsResponse.ok) {
-        throw new Error('Failed to fetch transactions');
+        throw new Error("Failed to fetch transactions");
       }
       const transactionsData = await transactionsResponse.json();
       setTransactions(transactionsData);
@@ -34,13 +37,12 @@ export default function Home() {
         `/api/budgets?month=${currentMonth}&year=${currentYear}`
       );
       if (!budgetsResponse.ok) {
-        throw new Error('Failed to fetch budgets');
+        throw new Error("Failed to fetch budgets");
       }
       const budgetsData = await budgetsResponse.json();
       setBudgets(budgetsData);
-
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
       setError(error.message);
     } finally {
       setIsLoading(false);
@@ -56,36 +58,36 @@ export default function Home() {
     try {
       const url = editingTransaction
         ? `/api/transactions/${editingTransaction._id}`
-        : '/api/transactions';
-      
-      const method = editingTransaction ? 'PUT' : 'POST';
-      
+        : "/api/transactions";
+
+      const method = editingTransaction ? "PUT" : "POST";
+
       const response = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save transaction');
+        throw new Error("Failed to save transaction");
       }
 
       await fetchData();
       setEditingTransaction(null);
     } catch (error) {
-      console.error('Error saving transaction:', error);
+      console.error("Error saving transaction:", error);
       setError(error.message);
     }
   };
 
   const handleBudgetSubmit = async (budgetData) => {
     try {
-      const response = await fetch('/api/budgets', {
-        method: 'POST',
+      const response = await fetch("/api/budgets", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ...budgetData,
@@ -94,11 +96,11 @@ export default function Home() {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to save budget');
-      
+      if (!response.ok) throw new Error("Failed to save budget");
+
       await fetchData();
     } catch (error) {
-      console.error('Error saving budget:', error);
+      console.error("Error saving budget:", error);
       setError(error.message);
     }
   };
@@ -106,29 +108,73 @@ export default function Home() {
   const handleEdit = (transaction) => {
     setEditingTransaction(transaction);
     // Scroll to form
-    document.getElementById('transaction-form')?.scrollIntoView({ behavior: 'smooth' });
+    document
+      .getElementById("transaction-form")
+      ?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this transaction?')) {
+    if (!window.confirm("Are you sure you want to delete this transaction?")) {
       return;
     }
 
     try {
       const response = await fetch(`/api/transactions/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete transaction');
+        throw new Error("Failed to delete transaction");
       }
 
       await fetchData();
     } catch (error) {
-      console.error('Error deleting transaction:', error);
+      console.error("Error deleting transaction:", error);
       setError(error.message);
     }
   };
+
+  const handleBudgetEdit = async (data) => {
+    try {
+      const response = await fetch(`/api/budgets/${editingBudget._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...data,
+          month: currentMonth,
+          year: currentYear,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update budget");
+
+      await fetchData();
+      setEditingBudget(null);
+    } catch (error) {
+      console.error("Error updating budget:", error);
+      setError(error.message);
+    }
+  };
+
+  const handleBudgetDelete = async (budgetId) => {
+    if (!budgetId) {
+      throw new Error('Budget ID is required');
+    }
+
+    const response = await fetch(`/api/budgets/${budgetId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete budget');
+    }
+
+    // Refresh data after successful deletion
+    await fetchData();
+  };
+
 
   if (isLoading) {
     return (
@@ -157,7 +203,7 @@ export default function Home() {
           {/* Left Column - Forms */}
           <div className="space-y-8">
             {/* Transaction Form */}
-            <div className="bg-white rounded-lg shadow p-6" id="transaction-form">
+            <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-xl font-semibold mb-4">
                 {editingTransaction ? 'Edit Transaction' : 'Add Transaction'}
               </h2>
@@ -169,12 +215,17 @@ export default function Home() {
 
             {/* Budget Form */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4">Set Budget</h2>
-              <BudgetForm onSubmit={handleBudgetSubmit} />
+              <h2 className="text-xl font-semibold mb-4">
+                {editingBudget ? 'Edit Budget' : 'Set Budget'}
+              </h2>
+              <BudgetForm 
+                onSubmit={editingBudget ? handleBudgetEdit : handleBudgetSubmit}
+                initialData={editingBudget}
+              />
             </div>
           </div>
 
-          {/* Right Column - Dashboard and Budgets */}
+          {/* Right Column */}
           <div className="lg:col-span-2 space-y-8">
             {/* Dashboard */}
             <div className="bg-white rounded-lg shadow">
@@ -192,7 +243,9 @@ export default function Home() {
                     date.toLocaleString('default', { month: 'long' }).toLowerCase() === currentMonth &&
                     date.getFullYear() === currentYear
                   );
-                })} 
+                })}
+                onEdit={setEditingBudget}
+                onDelete={handleBudgetDelete}
               />
             </div>
 

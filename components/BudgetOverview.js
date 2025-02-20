@@ -10,13 +10,12 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-export default function BudgetOverview({ budgets, transactions }) {
+export default function BudgetOverview({ budgets, transactions, onEdit, onDelete }) {
   const [budgetData, setBudgetData] = useState([]);
 
   useEffect(() => {
     if (!budgets || !transactions) return;
 
-    // Calculate spending for each category
     const spending = transactions.reduce((acc, transaction) => {
       if (transaction.type === 'expense') {
         const category = transaction.category.toLowerCase();
@@ -25,16 +24,14 @@ export default function BudgetOverview({ budgets, transactions }) {
       return acc;
     }, {});
 
-    // Combine budget and spending data
-    const combinedData = budgets.map(budget => {
-      const category = budget.category.toLowerCase();
-      return {
-        category: category.charAt(0).toUpperCase() + category.slice(1),
-        budget: budget.amount,
-        spent: spending[category] || 0,
-        remaining: Math.max(budget.amount - (spending[category] || 0), 0)
-      };
-    });
+    const combinedData = budgets.map(budget => ({
+      id: budget._id,
+      originalBudget: budget,
+      category: budget.category.charAt(0).toUpperCase() + budget.category.slice(1),
+      budget: budget.amount,
+      spent: spending[budget.category.toLowerCase()] || 0,
+      remaining: Math.max(budget.amount - (spending[budget.category.toLowerCase()] || 0), 0)
+    }));
 
     setBudgetData(combinedData);
   }, [budgets, transactions]);
@@ -48,19 +45,46 @@ export default function BudgetOverview({ budgets, transactions }) {
     }).format(value);
   };
 
+  const handleDeleteClick = async (budgetId) => {
+    if (window.confirm('Are you sure you want to delete this budget?')) {
+      try {
+        await onDelete(budgetId);
+      } catch (error) {
+        console.error('Error deleting budget:', error);
+        alert('Failed to delete budget. Please try again.');
+      }
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-4">
         {budgetData.map((item) => (
           <div
-            key={item.category}
+            key={item.id}
             className="bg-white rounded-lg p-4 shadow"
           >
             <div className="flex justify-between items-center mb-2">
-              <h3 className="font-medium">{item.category}</h3>
-              <span className="text-gray-500">
-                {formatCurrency(item.spent)} / {formatCurrency(item.budget)}
-              </span>
+              <div className="flex-1">
+                <h3 className="font-medium">{item.category}</h3>
+                <span className="text-gray-500">
+                  {formatCurrency(item.spent)} / {formatCurrency(item.budget)}
+                </span>
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => onEdit(item.originalBudget)}
+                  className="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 rounded border border-blue-600 hover:bg-blue-50"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDeleteClick(item.id)}
+                  className="px-3 py-1 text-sm text-red-600 hover:text-red-800 rounded border border-red-600 hover:bg-red-50"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
             <div className="relative pt-1">
               <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-200">
@@ -89,20 +113,26 @@ export default function BudgetOverview({ budgets, transactions }) {
         ))}
       </div>
 
-      <div className="h-80 bg-white p-4 rounded-lg shadow">
-        <h3 className="text-lg font-semibold mb-4">Budget vs. Spending</h3>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={budgetData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="category" />
-            <YAxis />
-            <Tooltip formatter={(value) => formatCurrency(value)} />
-            <Legend />
-            <Bar dataKey="budget" fill="#3B82F6" name="Budget" />
-            <Bar dataKey="spent" fill="#EF4444" name="Spent" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      {budgetData.length > 0 ? (
+        <div className="h-80 bg-white p-4 rounded-lg shadow">
+          <h3 className="text-lg font-semibold mb-4">Budget vs. Spending</h3>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={budgetData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="category" />
+              <YAxis />
+              <Tooltip formatter={(value) => formatCurrency(value)} />
+              <Legend />
+              <Bar dataKey="budget" fill="#3B82F6" name="Budget" />
+              <Bar dataKey="spent" fill="#EF4444" name="Spent" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <div className="text-center py-8 text-gray-500">
+          No budgets set for this month
+        </div>
+      )}
     </div>
   );
 }
